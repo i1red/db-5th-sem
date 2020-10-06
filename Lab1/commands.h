@@ -232,57 +232,6 @@ bool updateWeightClass(int id, char name[NAME_LENGTH], int weightLimit) {
 }
 
 
-bool deleteWeightClass(int id) {
-    int address = _getWeightClassAddress(id);
-    if (id != -1) {
-        WeightClass weightClass = _getWeightClassByAddress(address);
-        if (!weightClass.isDeleted) {
-            weightClass.isDeleted = true;
-            _writeWeightClass(weightClass, address);
-
-            --weightClassExistingRecordsCount;
-            updateWeightClassCounts();
-
-            return true;
-        }
-    }
-    return false;
-}
-
-
-bool deletePromotion(int id) {
-    int address = _getPromotionAddress(id);
-
-    if (address != -1) {
-        Promotion promotion = _getPromotionByAddress(address);
-        if (!promotion.isDeleted) {
-            promotion.isDeleted = true;
-            _writePromotion(promotion, address);
-            --promotionExistingRecordsCount;
-
-            int weightClassAddress = promotion.weightClassAddress;
-
-            WeightClass weightClass;
-            int recordSize = sizeof(WeightClass);
-
-            while (weightClassAddress != -1) {
-                fseek(weightClassDataFile, weightClassAddress, SEEK_SET);
-                fread(&weightClass, recordSize, 1, weightClassDataFile);
-                if(!weightClass.isDeleted) {
-                    weightClass.isDeleted = true;
-                    _writeWeightClass(weightClass, weightClassAddress);
-                    --weightClassExistingRecordsCount;
-                }
-                weightClassAddress = weightClass.nextWeightClassAddress;
-            }
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
 void _cleanPromotions() {
     FILE* tmpData = fopen(TMP_PROMOTION_DATA, "w+b");
     FILE* tmpIndex = fopen(TMP_PROMOTION_INDEX, "w+b");
@@ -383,5 +332,70 @@ void cleanGarbage() {
     weightClassTotalRecordsCount = weightClassExistingRecordsCount;
     updateWeightClassCounts();
 }
+
+
+void tryToCleanGarbage() {
+    double promotionsRatio =  (double)promotionTotalRecordsCount / (double)promotionExistingRecordsCount;
+    double weightClassesRatio =  (double)weightClassTotalRecordsCount / (double)weightClassExistingRecordsCount;
+
+    if (promotionsRatio > 1.5 || weightClassesRatio > 1.5) {
+        cleanGarbage();
+    }
+}
+
+
+bool deleteWeightClass(int id) {
+    int address = _getWeightClassAddress(id);
+    if (id != -1) {
+        WeightClass weightClass = _getWeightClassByAddress(address);
+        if (!weightClass.isDeleted) {
+            weightClass.isDeleted = true;
+            _writeWeightClass(weightClass, address);
+
+            --weightClassExistingRecordsCount;
+            updateWeightClassCounts();
+
+            tryToCleanGarbage();
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool deletePromotion(int id) {
+    int address = _getPromotionAddress(id);
+
+    if (address != -1) {
+        Promotion promotion = _getPromotionByAddress(address);
+        if (!promotion.isDeleted) {
+            promotion.isDeleted = true;
+            _writePromotion(promotion, address);
+            --promotionExistingRecordsCount;
+
+            int weightClassAddress = promotion.weightClassAddress;
+
+            WeightClass weightClass;
+            int recordSize = sizeof(WeightClass);
+
+            while (weightClassAddress != -1) {
+                fseek(weightClassDataFile, weightClassAddress, SEEK_SET);
+                fread(&weightClass, recordSize, 1, weightClassDataFile);
+                if(!weightClass.isDeleted) {
+                    weightClass.isDeleted = true;
+                    _writeWeightClass(weightClass, weightClassAddress);
+                    --weightClassExistingRecordsCount;
+                }
+                weightClassAddress = weightClass.nextWeightClassAddress;
+            }
+
+            tryToCleanGarbage();
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 #endif //LAB1_COMMANDS_H

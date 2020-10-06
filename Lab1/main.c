@@ -62,15 +62,15 @@ int main() {
     }
     initCounts();
 
-    fillDB();
-    deleteWeightClasses();
-    deletePromotions();
+    //fillDB();
+    //deleteWeightClasses();
+    //deletePromotions();
 
-    cleanGarbage();
 
     printPromotions();
     printWeightClasses();
     printCount();
+
     saveData();
     closeFiles();
     return 0;
