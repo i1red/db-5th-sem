@@ -14,7 +14,6 @@ class PromotionOut(_PromotionBase):
 
 
 class _PromotionPresidentBase(BaseModel):
-    promotion_id: int
     name: str
 
 
@@ -23,7 +22,7 @@ class PromotionPresidentIn(_PromotionPresidentBase):
 
 
 class PromotionPresidentOut(_PromotionPresidentBase):
-    pass
+    promotion_id: int
 
 
 class _FighterBase(BaseModel):
@@ -42,7 +41,6 @@ class FighterOut(_FighterBase):
 
 
 class _WeightClassBase(BaseModel):
-    promotion_id: int
     name: str
     weight_limit: int
 
@@ -53,11 +51,11 @@ class WeightClassIn(_WeightClassBase):
 
 class WeightClassOut(_WeightClassBase):
     id: int
+    promotion_id: int
 
 
 class _FighterWeightClassBase(BaseModel):
-    fighter_id: int
-    weight_class_id: int
+    pass
 
 
 class FighterWeightClassIn(BaseModel):
@@ -65,4 +63,5 @@ class FighterWeightClassIn(BaseModel):
 
 
 class FighterWeightClassOut(BaseModel):
-    pass
+    fighter_id: int
+    weight_class_id: int

@@ -10,7 +10,7 @@ Promotion = Table(
 
 PromotionPresident = Table(
     'promotion_president', metadata,
-    Column('promotion_id', None, ForeignKey('promotion.id')),
+    Column('promotion_id', None, ForeignKey('promotion.id'), unique=True),
     Column('name', String, nullable=False)
 )
 
