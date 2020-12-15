@@ -12,14 +12,14 @@ app.include_router(
     )
 )
 app.include_router(
-    create_router(
-        'fighters', models.Fighter, schemas.FighterIn, schemas.FighterOut
-    )
-)
-app.include_router(
     create_one_to_one_router(
         'promotions', 'promotion_president', 'promotion_presidents', models.PromotionPresident, 'promotion_id',
         schemas.PromotionPresidentIn, schemas.PromotionPresidentOut
+    )
+)
+app.include_router(
+    create_router(
+        'fighters', models.Fighter, schemas.FighterIn, schemas.FighterOut
     )
 )
 app.include_router(
@@ -31,7 +31,7 @@ app.include_router(
 app.include_router(
     create_many_to_many_router(
         'weight_classes', 'fighters', models.WeightClass, models.Fighter, models.FighterWeightClass,
-        'weight_class_id', 'fighter_id', schemas.WeightClassIn, schemas.WeightClassOut,
-        schemas.FighterIn, schemas.FighterOut, schemas.FighterWeightClassIn, schemas.FighterWeightClassOut
+        'weight_class_id', 'fighter_id', schemas.WeightClassOut, schemas.FighterOut,
+        schemas.FighterWeightClassIn, schemas.FighterWeightClassOut
     )
 )

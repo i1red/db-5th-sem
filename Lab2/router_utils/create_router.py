@@ -17,7 +17,7 @@ def create_router(plural_name: str, table: Table,
 
     @router.get('/{id}', response_model=schema_out)
     def get_entity(id: int) -> dict:
-        entity = db.get_entity_by_unique_value(table, 'id', id)
+        entity = db.get_entity(table, {'id': id})
         if entity is None:
             raise HTTPException(status_code=404)
 
@@ -42,7 +42,7 @@ def create_router(plural_name: str, table: Table,
 
     @router.delete('/{id}', response_model=schema_out)
     def delete_entity(id: int) -> dict:
-        entity = db.delete_entity_by_unique_value(table, 'id', id)
+        entity = db.delete_entity(table, {'id': id})
         if entity is None:
             raise HTTPException(status_code=404)
 

@@ -18,7 +18,7 @@ def create_one_to_one_router(main_plural_name: str, referencing_singular_name: s
 
     @router.get(f'/{main_plural_name}/{{fk}}/{referencing_singular_name}/', response_model=schema_out)
     def get_referencing_entity(fk: int) -> dict:
-        referencing_entity = db.get_entity_by_unique_value(table, fk_name, fk)
+        referencing_entity = db.get_entity(table, {fk_name: fk})
         if referencing_entity is None:
             raise HTTPException(status_code=404)
 
@@ -43,7 +43,7 @@ def create_one_to_one_router(main_plural_name: str, referencing_singular_name: s
 
     @router.delete(f'/{main_plural_name}/{{fk}}/{referencing_singular_name}/', response_model=schema_out)
     def delete_referencing_entity(fk: int) -> dict:
-        referencing_entity = db.delete_entity_by_unique_value(table, fk_name, fk)
+        referencing_entity = db.delete_entity(table, {fk_name: fk})
         if referencing_entity is None:
             raise HTTPException(status_code=404)
 

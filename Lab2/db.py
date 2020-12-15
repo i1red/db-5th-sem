@@ -13,10 +13,11 @@ _ENGINE = create_engine(f"postgresql+psycopg2://{_USER}:{_PASSWORD}@{_HOST}/{_DB
 metadata.create_all(_ENGINE)
 
 
-def get_entity_by_unique_value(table: Table, column_name: str, column_value: Any) -> dict:
+def get_entity(table: Table, conditions: dict[str, Any]) -> dict:
     with _ENGINE.connect() as connection:
         return connection.execute(
-            table.select().where(getattr(table.c, column_name) == column_value)
+            table.select().where(and_(*[getattr(table.c, column_name) == column_value
+                                        for column_name, column_value in conditions.items()]))
         ).fetchone()
 
 
@@ -32,13 +33,6 @@ def update_entity_by_unique_value(table: Table, column_name: str, column_value: 
         return connection.execute(
             table.update().values(**updated_values)
                 .where(getattr(table.c, column_name) == column_value).returning(*table.c)
-        ).fetchone()
-
-
-def delete_entity_by_unique_value(table: Table, column_name: str, column_value: Any) -> dict:
-    with _ENGINE.connect() as connection:
-        return connection.execute(
-            table.delete().where(getattr(table.c, column_name) == column_value).returning(*table.c)
         ).fetchone()
 
 
@@ -60,9 +54,9 @@ def list_entities_by_condition(table: Table, column_name: str, column_value: Any
         return list(connection.execute(table.select().where(getattr(table.c, column_name) == column_value)).fetchall())
 
 
-def get_entities_after_joining_tables(main_table: Table, binding_table: Table, column_name: str, column_value: Any) -> list:
+def list_entities_after_joining_tables(main_table: Table, binding_table: Table, column_name: str, column_value: Any) -> list:
     with _ENGINE.connect() as connection:
-        print(main_table.join(binding_table).select(*main_table.c).where(getattr(binding_table.c, column_name) == column_value))
         return list(connection.execute(
-            main_table.join(binding_table).select(*main_table.c).where(getattr(binding_table.c, column_name) == column_value)
+            main_table.join(binding_table).select().with_only_columns(main_table.c)
+                .where(getattr(binding_table.c, column_name) == column_value)
         ).fetchall())
