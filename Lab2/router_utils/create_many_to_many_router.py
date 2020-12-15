@@ -18,13 +18,17 @@ def create_many_to_many_router(first_plural_name: str, second_plural_name: str,
     router = APIRouter(tags=tags or [f'{first_plural_name} & {second_plural_name}'])
 
     @router.post(f'/{first_plural_name}/{{first_fk}}/{second_plural_name}/{{second_fk}}/')
-    def create_binding(first_fk: int, second_fk: int) -> dict:
-        binding_entity = db.create_entity(binding_table, {first_fk_name: first_fk, second_fk_name: second_fk})
+    def create_binding(first_fk: int, second_fk: int, binding: binding_schema_in) -> dict:
+        binding_entity = db.create_entity(
+            binding_table, {first_fk_name: first_fk, second_fk_name: second_fk, **binding.dict()}
+        )
         return binding_schema_out(**binding_entity).dict()
 
     @router.delete(f'/{first_plural_name}/{{first_fk}}/{second_plural_name}/{{second_fk}}/')
-    def create_binding(first_fk: int, second_fk: int) -> dict:
-        binding_entity = db.delete_entity(binding_table, {first_fk_name: first_fk, second_fk_name: second_fk})
+    def create_binding(first_fk: int, second_fk: int, binding: binding_schema_in) -> dict:
+        binding_entity = db.delete_entity(
+            binding_table, {first_fk_name: first_fk, second_fk_name: second_fk, **binding.dict()}
+        )
         return binding_schema_out(**binding_entity).dict()
 
     setups = [
